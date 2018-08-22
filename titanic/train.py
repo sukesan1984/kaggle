@@ -8,25 +8,7 @@ train['Sex'] = train['Sex'].str.replace('female', '1').replace('male', '0')
 #平均値で埋める
 train['Age'].fillna(train.Age.mean(), inplace=True)
 
-#print(train.Fare.unique())
 #Ticketの分類
-#print(train[train.Ticket.str.contains('((C\.A)|(CA)|(C\.A\.)).*')])
-#print(train[train.Ticket.str.contains('A/4.*')])
-#print(train[train.Ticket.str.contains('(A/5)|(A\.5).*')])
-#print(train[train.Ticket.str.contains('PC.*')])
-#print(train[train.Ticket.str.contains('^PP.*')])
-#print(train[train.Ticket.str.contains('^(S\.W\.)|(SW).*')])
-#print(train[train.Ticket.str.contains('P/PP.*')])
-#print(train[train.Ticket.str.contains('^\d*$')])
-#print(train[train.Ticket.str.contains('^STON.*')])
-#print(train[train.Ticket.str.contains('SC/P.*')]) #print(train[train.Ticket.str.contains('SC/AH.*')]) #print(train[train.Ticket.str.contains('SOTON.*')])
-#print(train[train.Ticket.str.contains('^A\./.*')])
-#print(train[train.Ticket.str.contains('^S\.C.*')])
-#print(train[train.Ticket.str.contains('^F\.C\.C\..*')])
-#print(train[train.Ticket.str.contains('^S\.O\.C\..*')]) #print(train[train.Ticket.str.contains('^C\s\d*')]) #print(train[train.Ticket.str.contains('^W\./C.*')]) #print(train[train.Ticket.str.contains('^LINE.*')]) #print(train[train.Ticket.str.contains('^S\.O\.C.*')])
-#print(train[train.Ticket.str.contains('^S\.O\./.*')])
-#print(train[train.Ticket.str.contains('^WE/P*')])
-
 def separate(remain, regexp, result):
     # 抽出する
     df = remain[remain.Ticket.str.match(regexp)]
@@ -82,44 +64,24 @@ result = replace_ticket_letter(result, '^S\.O\.P\.$', '27')
 
 result.loc[result.TicketNumber.str.match('^$', na=False), 'TicketNumber'] = 0
 
-
-#result = replace_ticket_letter(result, '^A\./\s$', '13')
-#result = replace_ticket_letter(result, '^F\.C\.C\.\s$', '15')
-#result = replace_ticket_letter(result, '^S\.O\.C\.\s$', '16')
-#result = replace_ticket_letter(result, '^S\.O\./\s$', '21')
-#result = replace_ticket_letter(result, '^S\.P\.\s$', '24')
-
-
-
 result.TicketLetter = result.TicketLetter.astype(int)
 #print(result.sort_values('TicketLetter').TicketLetter.value_counts())
 result = result.drop('Ticket', axis=1)
 print(result.head(10))
 
 
-def remain():
-    print(train[~train.Ticket.str.contains('((C\.A)|(CA)|(C\.A\.)).*')
-        &~train.Ticket.str.contains('A/4.*')
-        &~train.Ticket.str.contains('(A/5)|(A\.5).*')
-        &~train.Ticket.str.contains('PC.*')
-        &~train.Ticket.str.contains('^PP.*')
-        &~train.Ticket.str.contains('^(S\.W\.)|(SW).*')
-        &~train.Ticket.str.contains('P/PP.*')
-        &~train.Ticket.str.contains('^\d*$')
-        &~train.Ticket.str.contains('^STON.*')
-        &~train.Ticket.str.contains('SC/P.*')
-        &~train.Ticket.str.contains('SC/AH.*')
-        &~train.Ticket.str.contains('SOTON.*')
-        &~train.Ticket.str.contains('^A\./.*')
-        &~train.Ticket.str.contains('^S\.C.*')
-        &~train.Ticket.str.contains('^F\.C\.C\..*')
-        &~train.Ticket.str.contains('^S\.O\.C\..*')
-        &~train.Ticket.str.contains('^C\s\d*')
-        &~train.Ticket.str.contains('^W\./C.*')
-        &~train.Ticket.str.contains('^LINE.*')
-        &~train.Ticket.str.contains('^S\.O\.C.*')
-        &~train.Ticket.str.contains('^S\.O\./.*')
-        &~train.Ticket.str.contains('^WE/P*')
-    ])
+# Nameの分類
+def replace_name(result, regexp, category):
+    result.loc[result.Name.str.match(regexp), 'Name'] = category
 
-#remain()
+#print(result[
+#    ~result.Name.str.match('.*((Mr\.)|(Mr)).*')
+#    &~result.Name.str.match('.*((Mrs\.)|(Mrs)).*')
+#    &~result.Name.str.match('.*((Miss\.)|(Ms)|(Ms\.)).*')
+#    &~result.Name.str.match('.*Master\..*')
+#    &~result.Name.str.match('.*Dr\..*')
+#    &~result.Name.str.match('.*Rev\..*')
+#    &~result.Name.str.match('.*Major\..*')
+#    &~result.Name.str.match('.*Col\..*')
+#    ])
+result = replace_name(result, '.*((Mr\.)|(Mr)).*', 1)
