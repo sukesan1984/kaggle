@@ -67,12 +67,13 @@ result.loc[result.TicketNumber.str.match('^$', na=False), 'TicketNumber'] = 0
 result.TicketLetter = result.TicketLetter.astype(int)
 #print(result.sort_values('TicketLetter').TicketLetter.value_counts())
 result = result.drop('Ticket', axis=1)
-print(result.head(10))
 
 
 # Nameの分類
 def replace_name(result, regexp, category):
+    #print(result[result.Name.str.match(regexp)])
     result.loc[result.Name.str.match(regexp), 'Name'] = category
+    return result
 
 #print(result[
 #    ~result.Name.str.match('.*((Mr\.)|(Mr)).*')
@@ -84,4 +85,44 @@ def replace_name(result, regexp, category):
 #    &~result.Name.str.match('.*Major\..*')
 #    &~result.Name.str.match('.*Col\..*')
 #    ])
-result = replace_name(result, '.*((Mr\.)|(Mr)).*', 1)
+result = replace_name(result, '.*((Mrs\.)|(Mrs)).*', '1')
+result = replace_name(result, '.*((Mr\.)|(Mr)).*', '2')
+result = replace_name(result, '.*((Miss\.)|(Ms)|(Ms\.)).*', '3')
+result = replace_name(result, '.*Master\..*', '4')
+result = replace_name(result, '.*Dr\..*', '5')
+result = replace_name(result, '.*Rev\..*', '6')
+result = replace_name(result, '.*Major\..*', '7')
+result = replace_name(result, '.*Col\..*', '8')
+result = replace_name(result, '\D+', '9') # 最後に残ったのを変換
+result.Name = result.Name.astype(int)
+
+#Embarked変換
+result.Embarked = result.Embarked.replace('S', 1).replace('C', 2).replace('Q', 3).fillna(4)
+
+#Cabin変換
+#A-F
+#数字
+#作戦 A-Fを1-8にして一桁目にEncodingする
+#複数席あるやつは、全部数字にして足し合わせる？
+def replace_cabin(result):
+    result.Cabin = result.Cabin.fillna(0)
+    #print(result.Cabin.unique())
+    #print(result[result.Cabin.str.extract('(\w\d{0,3})')].unique())
+    result.Cabin = result.Cabin.replace('(?:A(\d{0,3}))', r"\1x1", regex=True)
+    result.Cabin = result.Cabin.replace('(?:B(\d{0,3}))', r"\1x2", regex=True)
+    result.Cabin = result.Cabin.replace('(?:C(\d{0,3}))', r"\1x3", regex=True)
+    result.Cabin = result.Cabin.replace('(?:D(\d{0,3}))', r"\1x4", regex=True)
+    result.Cabin = result.Cabin.replace('(?:E(\d{0,3}))', r"\1x5", regex=True)
+    result.Cabin = result.Cabin.replace('(?:F(\d{0,3}))', r"\1x6", regex=True)
+    result.Cabin = result.Cabin.replace('(?:G(\d{0,3}))', r"\1x7", regex=True)
+    result.Cabin = result.Cabin.replace('(?:T(\d{0,3}))', r"\1x8", regex=True)
+    #単純に複数のやつは結合してみる
+    result.Cabin = result.Cabin.replace('(\d*)\s(\d)', r'\1x0\2', regex=True)
+    result.Cabin = result.Cabin.replace('(\d*)x(\d)', r'\1\2', regex=True)
+    result.Cabin = result.Cabin.astype(int)
+    print(result.Cabin.unique())
+
+replace_cabin(result)
+
+print(result.head(10))
+
