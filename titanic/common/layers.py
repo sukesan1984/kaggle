@@ -74,8 +74,8 @@ class SoftmaxWithLoss:
         self.y = softmax(x)
 
         # 教師ラベルがone-hotベクトルの場合、正解のインデックスに変換
-        if self.t.size == self.y.size:
-            self.t = self.t.argmax(axis=1)
+        #if self.t.size == self.y.size:
+        #    self.t = self.t.argmax(axis=1)
 
         loss = cross_entropy_error(self.y, self.t)
         return loss
@@ -104,6 +104,18 @@ class Sigmoid:
     def backward(self, dout):
         dx = dout * (1.0 - self.out) * self.out
         return dx
+
+class ReLU:
+    def __init__(self):
+        self.params, self.grads = [], []
+        self.out = None
+
+    def forward(self, x):
+        return x * (x > 0)
+
+    def backward(self, dout):
+        return 1. * (dout > 0)
+
 
 
 class SigmoidWithLoss:
