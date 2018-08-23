@@ -1,9 +1,12 @@
+import sys
+sys.path.append('.')
 import pandas as pd
 import numpy as np
 import re
 train = pd.read_csv('data/train.csv') #前処理
 #性別を0, 1に
 train['Sex'] = train['Sex'].str.replace('female', '1').replace('male', '0')
+train.Sex = train.Sex.astype(int)
 
 #平均値で埋める
 train['Age'].fillna(train.Age.mean(), inplace=True)
@@ -63,6 +66,7 @@ result = replace_ticket_letter(result, '^SC$', '26')
 result = replace_ticket_letter(result, '^S\.O\.P\.$', '27')
 
 result.loc[result.TicketNumber.str.match('^$', na=False), 'TicketNumber'] = 0
+result.TicketNumber = result.TicketNumber.astype(int)
 
 result.TicketLetter = result.TicketLetter.astype(int)
 #print(result.sort_values('TicketLetter').TicketLetter.value_counts())
@@ -124,5 +128,9 @@ def replace_cabin(result):
 
 replace_cabin(result)
 
-print(result.head(10))
+result = result.astype(float)
+
+print(result.info(10))
+
+# Dataを入力と出力に分ける
 
