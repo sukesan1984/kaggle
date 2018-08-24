@@ -16,8 +16,8 @@ class OriginalNet(BaseModel):
             W = 0.01 * np.random.randn(previous_H, current_H)
             b = np.zeros(current_H)
             self.layers.append(Affine(W, b))
-            #self.layers.append(Sigmoid())
-            self.layers.append(ReLU())
+            self.layers.append(Sigmoid())
+            #self.layers.append(ReLU())
             previous_H = current_H
         W = 0.01 * np.random.randn(previous_H, O)
         b = np.zeros(O)
@@ -47,7 +47,7 @@ class OriginalNet(BaseModel):
             dout = layer.backward(dout)
         return dout
 
-    def show_params(self):
-        print(self.params)
-    
+    def show(self):
+        for layer in self.layers:
+            print(layer.params)
 
